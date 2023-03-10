@@ -1,6 +1,6 @@
-CFLAGS = -g -Wall -pedantic
+CFLAGS = -g -Wall -pedantic -Wno-pointer-arith
 
-all: hexdump 
+all: hexdump hexread
 .Phony: all
 
 %.o: %.c
@@ -9,7 +9,9 @@ all: hexdump
 hexdump: hexdump.o util.o
 	gcc $(CFLAGS) -o hexdump hexdump.o util.o
 
-
+hexread: hexread.o util.o
+	gcc $(CFLAGS) -o hexread hexread.o util.o
+	
 #util: util.o 
 #	gcc $(CFLAGS) -o util util.o
 
@@ -17,4 +19,4 @@ hexdump: hexdump.o util.o
 
 .Phony: clean
 clean:
-	rm -f util hexdump
+	rm -f util hexdump util.o hexdump.o hexread hexread.o

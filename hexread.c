@@ -8,39 +8,31 @@
 #include <fcntl.h>
 
 
+
 int main(int argc, char *argv[]){
-
-    // no arguments
     if (argc == 1){
-        printf("Enter a binary value:");
+        printf("Enter a hex value:");
         char *line;
-        //line limit is 128
-        size_t linelen = 128;
-        size_t characters;
+        size_t linelen = 32;
 
-
-        line = (char *)malloc(linelen * sizeof(char));
+        line = malloc(linelen * sizeof(char));
         if(line == NULL)
         {
             perror("Unable to allocate buffer");
             exit(1);
         }
 
-
-
-        characters = getline(&line, &linelen, stdin);
-        if (characters > 128){
-            printf("More than 128 characters entered\n");
-        }
+        getline(&line, &linelen, stdin);
         printf("You typed: %s\n", line);
-        char *hex = binary_to_hex((void *)line, (ssize_t) characters);
-        printf("\nHex value: %s\n", hex);
+        void *hex = hex_to_binary(line);
+        printf("\n Binary value: %s\n", (char *)hex);
+
+        free(line);
     }
     else {
         for(char **pargv = argv + 1; *pargv != argv[argc]; pargv++){
             
-            FILE *f;
-            f = fopen(*pargv, "r+");
+            FILE *f = fopen(*pargv, "r");
             printf("File: %s\n", *pargv);
             if(f == NULL){
                 printf("Error: Cannot open File: %s\n", *pargv);
@@ -55,19 +47,22 @@ int main(int argc, char *argv[]){
             fclose(temp);
 
             // read file
-            char buf[len];
-            fread(&buf, 1, len, f);    
-            buf[len] = '\0';
-            printf("Buffer: %s\n", buf);
+            void *buf = malloc(strlen(*pargv) + 1);
+            fread(buf, 1, len, f);
+            printf("buffer %s\n", (char *)buf);
 
-            // convert to hex
-            char *ret = binary_to_hex(buf, len);
-            printf("Hex value: %s\n", ret);
+            // convert to binary
+            void *ret = hex_to_binary((char *)buf);
+            printf("binary %s\n\n", (char *)ret);
+
 
             fclose(f);
+            free(buf);
             free(ret);
-
+        
         }
+
+
 
     }
 }

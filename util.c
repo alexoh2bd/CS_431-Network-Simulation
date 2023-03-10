@@ -48,9 +48,10 @@ char *binary_to_hex(void *data, ssize_t n){
 
 
 
-void *hex_to_binary(char *hex, ssize_t n){
-    void *ret = malloc(sizeof(char) * n);
-    int *arr= malloc(sizeof(int) * n);
+void *hex_to_binary(char *hex){
+    int n = strlen(hex);
+    void *ret = malloc(n+1);
+    int *arr= malloc(n+1);
     int i = 0;
     int s = 0;
     // printf("n: %d\n", n);
@@ -59,23 +60,24 @@ void *hex_to_binary(char *hex, ssize_t n){
     // converts hex to int array
     while(hex[i] != (char) ('\0')){
         if(hex[i] >= '0' && hex[i]<= '9'){
+
             arr[s] = (int)(hex[i]-'0');
             s++;
         }
         else if(hex[i] >= 'a' && hex[i]<='f'){
             arr[s] = (int)(hex[i]-'a' + 10);
             s++;
-        }
+        }   
         else if(hex[i] >= 'A' && hex[i]<='F'){
             arr[s] = (int)(hex[i]-'A' + 10);
             s++;
         }
-        else if(hex[i] == ' '){}
-        else{
-            free(ret);
-            printf("Error: invalid hex");
-            return NULL;
-        }
+        // else if(hex[i] == ' '){}
+        // else{
+        //     free(ret);
+        //     printf("Error: invalid hex");
+        //     return NULL;
+        // }
         i++;        
     }
 
@@ -89,6 +91,7 @@ void *hex_to_binary(char *hex, ssize_t n){
         k+=2;
     }
     // printf("\nret: ",ret);
+    free(arr);
     return ret;
 
 }
