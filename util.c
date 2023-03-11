@@ -7,20 +7,6 @@
 
 
 
-
-// int main(int argc, char **argv){
-
-//     char * hex = binary_to_hex("hello", 6);
-//     printf("Hex: %s\n", hex);
-//     printf("size of hex: %d\n",strlen(hex));
-
-//     void * bin = hex_to_binary("68 65 6c 6c 6f", strlen(hex));
-//     printf("\nbin: %s\n", bin);
-//     free(hex);
-//     free(bin);
-// }
-
-
 char *binary_to_hex(void *data, ssize_t n){
     char *ret = malloc(sizeof(char) *(3 * n));
     n--;
@@ -54,7 +40,6 @@ void *hex_to_binary(char *hex){
     int *arr= malloc(n+1);
     int i = 0;
     int s = 0;
-    // printf("n: %d\n", n);
     
 
     // converts hex to int array
@@ -72,12 +57,12 @@ void *hex_to_binary(char *hex){
             arr[s] = (int)(hex[i]-'A' + 10);
             s++;
         }
-        // else if(hex[i] == ' '){}
-        // else{
-        //     free(ret);
-        //     printf("Error: invalid hex");
-        //     return NULL;
-        // }
+        else if(hex[i] == ' ' ||  hex[i] == '\n' || hex[i] == '/'){}
+        else{
+            free(ret);
+            printf("Error: invalid hex");
+            return NULL;
+        }
         i++;        
     }
 

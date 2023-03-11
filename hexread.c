@@ -11,6 +11,7 @@
 
 int main(int argc, char *argv[]){
     if (argc == 1){
+        while(1){
         printf("Enter a hex value:");
         char *line;
         size_t linelen = 32;
@@ -23,37 +24,36 @@ int main(int argc, char *argv[]){
         }
 
         getline(&line, &linelen, stdin);
-        printf("You typed: %s\n", line);
+
         void *hex = hex_to_binary(line);
         printf("\n Binary value: %s\n", (char *)hex);
 
         free(line);
+        }
     }
     else {
         for(char **pargv = argv + 1; *pargv != argv[argc]; pargv++){
             
+            // open the file
             FILE *f = fopen(*pargv, "r");
-            printf("File: %s\n", *pargv);
             if(f == NULL){
                 printf("Error: Cannot open File: %s\n", *pargv);
                 exit(2);
             }
-            FILE *temp = fopen(*pargv, "r");
 
-            // get size of file
+            // get size of file 
+            FILE *temp = fopen(*pargv, "r");
             fseek(temp, 0, SEEK_END);
             int len = (ftell(temp)*sizeof(char)+1);
-            printf("Length: %d\n", len);
             fclose(temp);
 
             // read file
             void *buf = malloc(strlen(*pargv) + 1);
             fread(buf, 1, len, f);
-            printf("buffer %s\n", (char *)buf);
 
             // convert to binary
             void *ret = hex_to_binary((char *)buf);
-            printf("binary %s\n\n", (char *)ret);
+            printf("%s:\n%s\n\n", *pargv, (char *)ret);
 
 
             fclose(f);
@@ -61,8 +61,5 @@ int main(int argc, char *argv[]){
             free(ret);
         
         }
-
-
-
     }
 }
