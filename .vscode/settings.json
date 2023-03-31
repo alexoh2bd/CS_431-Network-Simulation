@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "stdlib.h": "c",
+        "unistd.h": "c",
+        "cs431vde.h": "c",
+        "string.h": "c"
+    }
+}
