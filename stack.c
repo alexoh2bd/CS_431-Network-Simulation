@@ -15,6 +15,7 @@ int main(int argc, char *argv[])
 {
     int fds[2];
 
+
     uint8_t frame[1600];
     ssize_t frame_len;
     char *data_as_hex;
@@ -46,8 +47,7 @@ int main(int argc, char *argv[])
         // src address
         strncpy(src, (char *)(data_as_hex+(sizeof(char)*18)), 17);
         printf("src: %s\n", src);
-
-
+        
         // dest address
         strncpy(dest, data_as_hex, 17);
         printf("dest: %s\n", dest);
