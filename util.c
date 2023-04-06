@@ -26,6 +26,7 @@ char *binary_to_hex(void *data, ssize_t n){
         }
         sprintf(ret + i, " ");
         i++;
+        //printf("ret: %s\n", ret);
       
     }
     
@@ -41,7 +42,6 @@ void *hex_to_binary(char *hex){
     int i = 0;
     int s = 0;
     
-
     // converts hex to int array
     while(hex[i] != (char) ('\0')){
         if(hex[i] >= '0' && hex[i]<= '9'){

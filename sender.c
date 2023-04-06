@@ -6,9 +6,11 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdint.h>
+#include <math.h>
 
 #include "util.h"
 #include "cs431vde.h"
+#include "crc32.h"
 
 int 
 main(int argc, char *argv[])
@@ -30,11 +32,28 @@ main(int argc, char *argv[])
         exit(1);
     }
     // memset(frame, '\xff', 64);
-    char temp[] = "11 22 33 aa bb cc 77 88 99 dd ee ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff a1 a2 a3 a4 a5";
-    strncpy((char *)frame, hex_to_binary(temp), 208);
+    char temp[] = "11 22 33 aa bb cc 77 88 99 dd ee ff ff ff bb bb ff ff 33 44 55 bb bb ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff a1 a2 a3 a4 a5";
+
+    uint32_t fcs = crc32(0, (void *) temp, sizeof(temp));
+    printf("fcs: %d\n", fcs);
+    char hexfcs[11];
+    sprintf(hexfcs, "%X", fcs); 
+    printf("hexfcs: %s\n", hexfcs);
+    char *finalfcs= malloc(17);
+
+    char *final  = malloc (strlen(temp) + 12);
+
+    // for(int i = 0; i< strlen(hexfcs); i++){
+    //     strncpy(finalfcs, &hexfcs + i], 2);
+    //     strncpy(finalfcs, " ", 1);
+    // }
+    final = strcat(temp, finalfcs);
+
+    printf("final: %s\n", final);
+    strncpy((char *)frame, hex_to_binary(final), strlen(final));
     
 
-    frame_len = 71;
+    frame_len = round(strlen(temp)/3) + 2;
 
     printf("sending frame, length %ld\n", frame_len);
 
