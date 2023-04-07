@@ -17,8 +17,8 @@ main(int argc, char *argv[])
 {
     int fds[2];
 
-    uint8_t frame[1600];
-    ssize_t frame_len;
+    // uint8_t frame[1600];
+    // ssize_t frame_len;
 
     int connect_to_remote_switch = 0;
     char *local_vde_cmd[] = { "vde_plug", NULL };
@@ -31,57 +31,12 @@ main(int argc, char *argv[])
         printf("Could not connect to switch, exiting.\n");
         exit(1);
     }
-    // memset(frame, '\xff', 64);
-    char temp[] = "11 22 33 aa bb cc 77 88 99 dd ee ff ff ff bb bb ff ff 33 44 55 bb bb ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff a1 a2 a3 a4 a5";
-
-    uint32_t fcs = crc32(0, (void *) temp, sizeof(temp));
-    printf("fcs: %d\n", fcs);
-    char hexfcs[11];
-    sprintf(hexfcs, "%X", fcs); 
-    printf("hexfcs: %s\n", hexfcs);
-    char *finalfcs= malloc(17);
-
-    char *final  = malloc (strlen(temp) + 12);
-
-    // for(int i = 0; i< strlen(hexfcs); i++){
-    //     strncpy(finalfcs, &hexfcs + i], 2);
-    //     strncpy(finalfcs, " ", 1);
-    // }
-    final = strcat(temp, finalfcs);
-
-    printf("final: %s\n", final);
-    strncpy((char *)frame, hex_to_binary(final), strlen(final));
-    
-
-    frame_len = round(strlen(temp)/3) + 2;
-
-    printf("sending frame, length %ld\n", frame_len);
-
-    send_ethernet_frame(fds[1], frame, frame_len);
-
-    // while(1){
-    //     char *line;
-    //     size_t linelen = 128;
-
-    //     line = malloc(linelen * sizeof(char));
-    //     if(line == NULL)
-    //     {
-    //         perror("Unable to allocate buffer");
-    //         exit(1);
-    //     }
-
-    //     getline(&line, &linelen, stdin);
-
-    //     strncpy(frame, hex_to_binary(line), frame_len);
-        
-    //     send_ethernet_frame(fds[1], frame, frame_len);
-    //     free(line);
-        
-    // }
+    //memset(frame, '\xff', 2);
+    char temp[] = {"\xab\xff\xff\xff\xff\xff\x77\x88\x99\xdd\xee\xff\xff\xff\xff\xff\xff\xbb\xbb\xff\xff\x33\xdd\xee\xff\xff\xff\xbb\xbb\xff\xff\x33\xdd\xee\xff\xff\xff\xbb\xbb\xff\xff\x33\xdd\xee\xff\xff\xff\xbb\xbb\xff\xff\x33\xdd\xee\xff\xff\xff\xbb\xbb\xff\xff\xff\xaa\xbb\xcc\x70\x83\x42\x3e\xee\xff\xff\xff\xff\xff\xff\xbb\xee\xff\xff\xff\xff\xff\xff\xbb\x83\x42\x3e\xee\xff\xff\xff\xff\xff\xff\xbb\xee\xff\xff\xff\xff\xff\xff\xbb\x83\x42\x3e\xee\xff\xff\xff\xff\xff\xff\xbb\xee\xff\xff\xff\xff\xff\xff\xbb\x83\x42\x3e\xee\xff\xff\xff\xff\xff\xff\xbb\xee\xff\xff\xff\xb1\x0a\xf6\x15"
+    };
 
 
-
-
+    send_ethernet_frame(fds[1], temp, strlen(temp));
 
 
     /* If the program exits immediately after sending its frames, there is a

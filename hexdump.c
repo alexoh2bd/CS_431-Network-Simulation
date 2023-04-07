@@ -27,8 +27,6 @@ int main(int argc, char *argv[]){
             exit(1);
         }
 
-
-
         characters = getline(&line, &linelen, stdin);
         if (characters > 128){
             printf("More than 128 characters entered\n");

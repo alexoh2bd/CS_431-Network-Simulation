@@ -32,8 +32,7 @@ hexread: hexread.o util.o
 sender: sender.o util.o cs431vde.o crc32.o
 	gcc $(CFLAGS) -o sender sender.o util.o cs431vde.o crc32.o
 
-binexpback: binexpback.o 
-	gcc $(CFLAGS) -o binexpback binexpback.o
+
 
 receiver: receiver.o util.o cs431vde.o
 	gcc $(CFLAGS) -o receiver receiver.o util.o cs431vde.o
