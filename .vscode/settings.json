@@ -10,5 +10,6 @@
         "string_view": "c",
         "vector": "c",
         "iterator": "c"
-    }
+    },
+    "C_Cpp.errorSquiggles": "enabled"
 }

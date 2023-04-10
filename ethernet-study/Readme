@@ -1,0 +1,37 @@
+Binary Exponential Backoff
+
+In the file binexpback.c, I simulated Ethernet behavior when multiple devices attempt to send frames at once. Once two or more devices send a frame at once, they "collide" and each device waits 2 ^ number of times which the device has collided previously. 
+
+At 10 devices, the time varies generally betwen 25-45 timeslots.
+At 20 devices, 50-150.
+At 40 devices, 200-400.
+At 80 devices, 600-1000+. 
+
+The time taken is dependent on the number of collisions made. 
+At 10 devices, roughly 5-6 collisions are made. 
+At 20 devices, roughly 7-8.
+At 40 devices, roughly 9-10.
+At 80 devices, roughly 10-11.
+As we double the number of devices, the range of collisions increments by 1-2, naturally aligning with the powers of two made as we increment timecycles. 
+
+
+Hub Simulation 
+
+In hub.c, I simulate n devices sending frames over an Ethernet hub. If 2 or more frames are sent over the hub at the same time, then the frames are not received.
+
+At n = 10; 0.161%, 0.180%, 0.282%, 0.260%, and 0.161% of frames were received. Mean 0.208%.
+At n = 20; 0% of the frames were received for all 5 trials.
+At n = 40; 0% of the frames were received for all 5 trials.
+
+
+Switch Simulation
+
+In switch.c, I simulate n devices sending frames over an Ethernet switch. If 2 or more frames to the same target, then the frames are not received. 
+
+At n = 10; 65.6%, 65.1%, 64.9%, 63.9%, and 64.6% of frames were received. Mean: 64.8%.
+At n = 20; 61.4%, 61.7%, 62.3%, 61.5%, and 61.7%. Mean: 61.7%.
+At n = 40; 60.4%, 60.5%, 60.9%, 60.7%, and 61.3%. Mean: 60.8%.
+
+
+
+
