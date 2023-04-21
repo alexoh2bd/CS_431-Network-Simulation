@@ -92,6 +92,7 @@ connect_to_vde_switch(int fds[2], char *cmd[])
 		return -1;
 	}
 
+
     /* fork & exec vde_plug */
     /* Note that we brazenly assume all the close(2) and dup2(2) calls
      * succeed.  Naughty, naughty. */

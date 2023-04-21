@@ -12,6 +12,9 @@ all: hexdump hexread sender receiver
 stacksend: stack sender 
 .Phony: $^
 
+senders: sender1a sender2a
+.Phony: $^
+
 %.o: %.c
 	gcc $(CFLAGS) -c -o $@ $^
 
@@ -32,6 +35,11 @@ hexread: hexread.o util.o
 sender: sender.o util.o cs431vde.o crc32.o
 	gcc $(CFLAGS) -o sender sender.o util.o cs431vde.o crc32.o
 
+sender1a: sender1a.o util.o cs431vde.o crc32.o
+	gcc $(CFLAGS) -o sender1a  sender1a.o util.o cs431vde.o crc32.o
+
+sender2a: sender2a.o util.o cs431vde.o crc32.o
+	gcc $(CFLAGS) -o sender2a  sender2a.o util.o cs431vde.o crc32.o
 
 
 receiver: receiver.o util.o cs431vde.o
@@ -40,4 +48,4 @@ receiver: receiver.o util.o cs431vde.o
 
 .Phony: clean
 clean:
-	rm -f util hexdump util.o hexdump.o hexread hexread.o stack stack.o sender sender.o receiver receiver.o
+	rm -f util hexdump util.o hexdump.o hexread hexread.o stack stack.o sender sender.o receiver receiver.o crc32.o cs431vde.o
