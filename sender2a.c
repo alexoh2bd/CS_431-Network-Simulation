@@ -33,14 +33,14 @@ main(int argc, char *argv[])
     }
     //memset(frame, '\xff', 2);
      // includes Eth header
-    char frame[] = {    "\x77\x88\x99\xdd\xee\xff"  // |        Destination ETH Address          |
-                        "\x77\x88\x99\x11\x22\x33"  // |        Source ETH Address               |
+    char frame[] = {    "\x10\x10\x10\x10\x10\x10"  // |        Destination ETH Address          |
+                        "\x50\x50\x50\x50\x50\x10"  // |        Source ETH Address               |
                         "\x08\x00"
-                        "\x45\x14\x00\x94" // | Version | IHL | Type of Service | Total Length    |
+                        "\x45\x14\x00\x90" // | Version | IHL | Type of Service | Total Length    |
                         "\xff\xff\xff\xff" // |       ID     | Flags     |      Fragment offset   |
-                        "\x02\x02\x00\x00" // | Time to Live  | Protocol  | Header Checksum       |
-                        "\x08\x10\x20\x40" // |     Source Address          | 
-                        "\x35\x35\xaf\xcd" // |     Destination Address     |
+                        "\x10\x02\x06\x9d" // | Time to Live  | Protocol  | Header Checksum       |
+                        "\x35\x35\xaf\xcd" // |     Source Address          | 
+                        "\x08\x10\x20\x40" // |     Destination Address     |
                         "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
                         "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
                         "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
@@ -48,7 +48,8 @@ main(int argc, char *argv[])
                         "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
                         "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
                         "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
-                        "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"         
+                        "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb"
+                        "\x1b\xc3\x17\xd6"         
     };
 
     send_ethernet_frame(fds[1], frame, 162);

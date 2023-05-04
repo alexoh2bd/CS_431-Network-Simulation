@@ -58,7 +58,7 @@ handle_ethernet_frame(struct interface *iface){
 
     // check fcs
     else if(memcmp(hexfcs,fcs, 4) != 0){
-        printf("  ignoring %zd-byte frame (bad fcs: got %s expected %s)\n)" , frame_len, binary_to_hex((void *)fcs, 5), binary_to_hex((void *)hexfcs, 5));
+        printf("  ignoring %zd-byte frame (bad fcs: got %s expected %s)\n" , frame_len, binary_to_hex((void *)fcs, 5), binary_to_hex((void *)hexfcs, 5));
         return -1;
     }
 
@@ -74,6 +74,7 @@ handle_ethernet_frame(struct interface *iface){
     payload = frame + sizeof(struct eth_header);
     payload_len = frame_len - sizeof(struct eth_header);
     // determines if address if for 
+    printf("eh->dst_addr: %s\n", binary_to_hex(eh->dst_addr, 7));
     if(memcmp(eh->dst_addr, iface->eth_addr, 6)==0 || isbroadcast == 1){
         char *hexmac = binary_to_hex(eh->src_addr, 7);
         printf("  frame is for me, from %s\n", hexmac);

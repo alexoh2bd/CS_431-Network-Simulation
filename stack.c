@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <math.h>
+#include <poll.h>
 
 #include "crc32.h"
 #include "util.h"
@@ -18,6 +19,7 @@ struct arp_entry{
     char mac [24];
 };
 
+int num_interfaces = 0;
 struct arp_entry arp_cache[10];
 int arpsize = 0;
 
@@ -47,9 +49,27 @@ int main(int argc, char *argv[])
     add_arp((uint8_t *) "\x50\x50\x50\x50\x50\x10", 0x3535afcd);    // sender2a
     add_arp((uint8_t *) "\x40\x40\x40\x40\x40\x40", 0x4545afcd);    // sender2b
 
+    //  ASSIGNMENT 3 POLLLLS
+    struct pollfd fds[num_interfaces];
+    for(int i = 0; i < num_interfaces; i++){
+        fds[i].fd = interfaces[i].in_fd;
+        fds[i].events = POLLIN;
+    }
 
     while(1){
-        handle_ethernet_frame(&interfaces[0]);
+        if (poll(fds, num_interfaces, -1) < 0) {
+            perror("ERROR in poll");
+            exit(1);
+        }
+
+        for(int i = 0; i < num_interfaces; i++){
+            if(fds[i].revents & POLLIN){
+                // if there is a readable input, handle ethernet frame
+                // printf("stack received ethernet frame on interface %d\n", i);
+                handle_ethernet_frame(&interfaces[i]);
+            }
+        }
+        
     }
 
     return 0;
@@ -88,6 +108,7 @@ add_interface(char *vde_control_file, uint8_t *eth_addr, uint32_t ip_addr, char 
     mac_as_string = binary_to_hex(iface->eth_addr, 7);
     printf("Connected to interface %s to switch %s, IP is %u, MAC is %s\n", iface->name, vde_control_file, iface->ip_addr, mac_as_string);
     free(mac_as_string);
+    num_interfaces ++;
 
     return 0;
 
