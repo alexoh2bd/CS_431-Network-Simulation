@@ -14,6 +14,12 @@ struct route {
     uint32_t gateway;
     struct interface *iface;
 };
+struct icmpheader{
+    uint8_t type;
+    uint8_t code;
+    uint16_t checksum;
+    uint32_t unused;
+};
 
 struct IPheader{
     uint8_t ihl;
@@ -32,6 +38,7 @@ struct IPheader{
 void ip_init(void);
 int add_route(uint32_t dest, uint32_t nm, uint32_t gw, struct interface *iface);
 int handle_ip_packet(struct interface *iface, uint8_t *packet, int packet_len);
+int send_ICMP(struct icmpheader *icmp, uint8_t * packet, ssize_t packet_len);
 
 
 #endif

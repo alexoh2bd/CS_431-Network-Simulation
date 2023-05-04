@@ -39,33 +39,71 @@ main(int argc, char *argv[])
    
 
     // includes Eth header
-    char frame[] = {    "\x11\x22\x33\xaa\xbb\xcc"
-                        "\x77\x88\x99\xdd\xee\xff"
-                        "\x08\x00"
-                        "\x45\x14\x00\xab" // | Version | IHL | Type of Service | Total Length    |
-                        "\xff\xff\xff\xff" // |       ID     | Flags     |      Fragment offset   |
-                        "\x02\x02\x00\x00" // | Time to Live  | Protocol  | Header Checksum       |
-                        "\x08\x10\x20\x40" // |     Source Address          | 
-                        "\x35\x35\xaf\xcd" // |     Destination Address     |
-                        "\xff\xff\xff\xbb\xbb\xff\xff\x33\xdd\xee\xff\xff\xff\xbb\xbb\xff"
-                        "\xff\x33\xdd\xee\xff\xff\xff\xbb\xbb\xff\xff\x33\xdd\xee\xff"
-                        "\xff\xff\xbb\xbb\xff\xff\x33\xdd\xee\xff\xff\xff\xbb\xbb\xff"
-                        "\xff\xff\xaa\xbb\xcc\x70\x83\x42\x3e\xee\xff\xff\xff\xff\xff"
-                        "\xff\xbb\xee\xff\xff\xff\xff\xff\xff\xbb\x83\x42\x3e\xee\xff"
-                        "\xff\xff\xff\xff\xff\xbb\xee\xff\xff\xff\xff\xff\xff\xbb\x83"
-                        "\xff\xff\xbb\x83\x42\x3e\xee\xff\xff\xff\xff\xff\xff\xbb\xee"
-                        "\xff\xff\xbb\x83\x42\x3e\xee\xff\xff\xff\xff\xff\xff\xbb\xee"
-                        "\xff\xff\xbb\x83\x42\x3e\xee\xff\xff\xff\xff\xff\xff\xbb\xee"
-                        "\xff\xff\xbb\x83\x42\x3e\xee\xff\xff\xff\xff\xe7\x9d\x59\x35"
+    char frame[] = {    
+                        // arp
+                        // "\xff\xff\xff\xff\xff\xff"      //  DEST
+                        // "\x77\x88\x99\xdd\xee\xff"      //  SOURCE
+                        // "\x08\x06"                      //  ARP TYPE
+                        // "\x00\x01\x08\x00"              // 
+                        // "\x06\x04\x00\x01"
+                        // "\x77\x88\x99\xdd"              //  SOURCE MAC
+                        // "\xee\xff\x08\x10"              //  SOURCE MAC   |   SOURCE IP
+                        // "\x20\x40\x00\x00"              //  SOURCE IP    |   0's for dest mac
+                        // "\x00\x00\x00\x00"              //  Target 0's for dest MAC
+                        // "\x35\x35\xaf\xcd"              //  Target IP whose MAC we want
+                        // "\x00\x00\x00\x00"              // 0's for
+                        // "\x00\x00\x00\x00"
+                        // "\x00\x00\x00\x00"
+                        // "\x00\x00\x00\x00"
+                        // "\x02\xc1\x70\xb1"
+
+
+
+                        "\x11\x22\x33\xaa\xbb\xcc"  // |    Dest ETH address        |
+                        "\x77\x88\x99\xdd\xee\xff"  // |    Source eth address      |
+                        "\x08\x00"                  // |    IP Type        |
+                        "\x45\x14\x00\x94"          // | Version | IHL | Type of Service | Total Length    |
+                        "\xff\xff\xff\xff"          // |       ID     | Flags     |      Fragment offset   |
+                        "\x10\x02\xf2\x8c"          // | Time to Live  | Protocol  | Header Checksum       |
+                        "\x08\x10\x20\x40"          // |     Source Address          | 
+                        "\x45\x45\xaf\xcd"          // |     Destination Address     |
+                        "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"    
+                        "\xe0\xc3\xc5\x00" // |     Frame Check Sequence|
+
+// checking ttl
+                        // "\x11\x22\x33\xaa\xbb\xcc"  // |    Dest ETH address        |
+                        // "\x77\x88\x99\xdd\xee\xff"  // |    Source eth address      |
+                        // "\x08\x00"                  // |    Type        |
+                        // "\x45\x14\x00\x94"          // | Version | IHL | Type of Service | Total Length    |
+                        // "\xff\xff\xff\xff"          // |       ID     | Flags     |      Fragment offset   |
+                        // "\x01\x02\x02\xac"          // | Time to Live  | Protocol  | Header Checksum       |
+                        // "\x08\x10\x20\x40"          // |     Source Address          | 
+                        // "\x35\x35\xaf\xcd"          // |     Destination Address     |
+                        // "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        // "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        // "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        // "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        // "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        // "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        // "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        // "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"    
+                        // "\x4a\xb2\xf6\xbb" 
     };
     int frame_len;
     char * data_as_hex;
 
-    send_ethernet_frame(fds[1], frame, 185);
+    send_ethernet_frame(fds[1], frame, 166);
 
     while((frame_len = receive_ethernet_frame(fds[0], frame)) > 0) {
-        data_as_hex = binary_to_hex(frame, frame_len);
-        printf("received frame, length %ld:\n", frame_len);
+        data_as_hex = binary_to_hex(frame, frame_len+4);
+        printf("received frame, length %d:\n", frame_len);
         puts(data_as_hex);
         free(data_as_hex);
     }

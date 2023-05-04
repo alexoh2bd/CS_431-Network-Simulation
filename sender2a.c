@@ -33,38 +33,36 @@ main(int argc, char *argv[])
     }
     //memset(frame, '\xff', 2);
      // includes Eth header
-    char frame[] = {    "\x11\x22\x33\xaa\xbb\xcc"
-                        "\x77\x88\x99\xdd\xee\xff"
+    char frame[] = {    "\x77\x88\x99\xdd\xee\xff"  // |        Destination ETH Address          |
+                        "\x77\x88\x99\x11\x22\x33"  // |        Source ETH Address               |
                         "\x08\x00"
-                        "\x45\x14\x00\xab" // | Version | IHL | Type of Service | Total Length    |
+                        "\x45\x14\x00\x94" // | Version | IHL | Type of Service | Total Length    |
                         "\xff\xff\xff\xff" // |       ID     | Flags     |      Fragment offset   |
                         "\x02\x02\x00\x00" // | Time to Live  | Protocol  | Header Checksum       |
                         "\x08\x10\x20\x40" // |     Source Address          | 
-                        "\x12\x34\x56\x78" // |     Destination Address     |
-                        "\xff\xff\xff\xbb\xbb\xff\xff\x33\xdd\xee\xff\xff\xff\xbb\xbb\xff"
-                        "\xff\x33\xdd\xee\xff\xff\xff\xbb\xbb\xff\xff\x33\xdd\xee\xff"
-                        "\xff\xff\xbb\xbb\xff\xff\x33\xdd\xee\xff\xff\xff\xbb\xbb\xff"
-                        "\xff\xff\xaa\xbb\xcc\x70\x83\x42\x3e\xee\xff\xff\xff\xff\xff"
-                        "\xff\xbb\xee\xff\xff\xff\xff\xff\xff\xbb\x83\x42\x3e\xee\xff"
-                        "\xff\xff\xff\xff\xff\xbb\xee\xff\xff\xff\xff\xff\xff\xbb\x83"
-                        "\xff\xff\xbb\x83\x42\x3e\xee\xff\xff\xff\xff\xff\xff\xbb\xee"
-                        "\xff\xff\xbb\x83\x42\x3e\xee\xff\xff\xff\xff\xff\xff\xbb\xee"
-                        "\xff\xff\xbb\x83\x42\x3e\xee\xff\xff\xff\xff\xff\xff\xbb\xee"
-                        "\xff\xff\xbb\x83\x42\x3e\xee\xff\xff\xff\xff\x28\x54\x96\xe7"
+                        "\x35\x35\xaf\xcd" // |     Destination Address     |
+                        "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"         
     };
 
-    // send_ethernet_frame(fds[1], frame, 185);
+    send_ethernet_frame(fds[1], frame, 162);
     int frame_len;
     char * data_as_hex;
     while((frame_len = receive_ethernet_frame(fds[0], frame)) > 0) {
         data_as_hex = binary_to_hex(frame, frame_len);
-        printf("received frame, length %ld:\n", frame_len);
+        printf("received frame, length %d:\n", frame_len);
         puts(data_as_hex);
         free(data_as_hex);
     }
 
     /* If the program exits immediately after sending its frames, there is a
-     * possibility the frames won't actually be delivered.  If, for example,
+     * possibility  q the frames won't actually be delivered.  If, for example,
      * the "remote_vde_cmd" above is used, the user might not even finish
      * typing their password (which is accepted by a child process) before
      * this process terminates, which would result in send frames not actually

@@ -24,6 +24,7 @@ uint16_t compute_icmp_checksum(struct icmpheader *icmp);
 int compose_ICMP_frame(uint8_t *frame, struct icmpheader *icmp, uint8_t *data, size_t data_len);
 
 
+
 extern struct interface interfaces[];
 
 void 
@@ -41,6 +42,10 @@ int handle_ip_packet(struct interface *iface, uint8_t *packet, int packet_len){
     char *hexsrcaddress = binary_to_hex(&ip->srcAddress, 5);
     char *hexdestaddress = binary_to_hex(&ip->dstAddress, 5);
 
+    // take out fcs count
+    packet_len -= 4;
+
+
     // printf("net to host: %04x\n", ntohs(ip->headchksum));
     // printf("host to net :   %04x\n", htons(ip->headchksum));
 
@@ -51,6 +56,7 @@ int handle_ip_packet(struct interface *iface, uint8_t *packet, int packet_len){
  
 
     // Length of IP packet does not match
+    printf("packet length = %04x\n",packet_len);
     if(packet_len < ntohs(ip->length)){
         printf("Dropping packet from %s (is %04x, should be: %04x)\n", hexsrcaddress,  ntohs(ip->length), packet_len);
         return -1;
@@ -93,16 +99,12 @@ int add_route(uint32_t dest, uint32_t nm, uint32_t gw, struct interface *iface){
 
 // Routes packet
 int route_packet(uint8_t *packet, ssize_t packet_len){
-    printf("packet: %s\n", binary_to_hex(packet, packet_len));
-    struct icmpheader icmp;
+    // printf("packet: %s\n", binary_to_hex(packet, packet_len));
+    struct icmpheader *icmp;
     struct IPheader *ip = (struct IPheader *)packet;
     struct route *r;
-    struct route *r2;
     uint8_t *destethaddr;
     struct eth_header tempeth;
-    uint8_t frame[ETH_MAX_FRAME_LEN];
-    uint8_t icmpframe[ETH_MAX_FRAME_LEN];
-    int icmp_len;
     size_t frame_len;
     
 
@@ -113,17 +115,14 @@ int route_packet(uint8_t *packet, ssize_t packet_len){
 
     // find eth address associated with MAC address
     r = lookup_route(ntohl(ip->dstAddress));
-    
     if(r == NULL){
+        icmp = malloc(sizeof(icmp));
         printf("  dropping packet: no matching route. Network Unreachable.\n");
-        icmp.type = 3;
-        icmp.code = 0;
-        icmp.checksum = 0;
-        uint8_t *dsteth;
-        if((dsteth = arp_lookup(ip->srcAddress)) == NULL){
-            printf(" could not find return ip");
-            return -1;
-        }
+        icmp->type = 3;
+        icmp->code = 0;
+        icmp->checksum = 0;
+        send_ICMP(icmp, packet, packet_len);
+        free(icmp);
 
 
 
@@ -134,38 +133,18 @@ int route_packet(uint8_t *packet, ssize_t packet_len){
 
     if(ip->ttl <= 0){
         printf("Dropping packet, (TTL exceeded)\n");
-
+        icmp = malloc(sizeof(icmp));
         // set ICMP values
-        icmp.type = 11;
+        icmp->type = 11;
         if(ip-> ttl ==0){
-            icmp.code = 0;
+            icmp->code = 0;
         }else{
-            icmp.code = 1;
+            icmp->code = 1;
         }
-        icmp.checksum = 0;
-        uint8_t * dsteth;
-        if((dsteth = arp_lookup(ip->srcAddress)) == NULL){
-            printf(" could not find return ip");
-            return -1;
-        }
-        memcpy (tempeth.dst_addr, dsteth, 6); // destination eth
-        memcpy (tempeth.src_addr, r-> iface -> eth_addr, 6); // source eth
-        tempeth.type = ETH_TYPE_IP;
+        icmp->checksum = 0;
 
-
-        icmp_len = compose_ICMP_frame(icmpframe, &icmp, packet, packet_len);
-        // printf("    icmp frame: %s\n", binary_to_hex(icmpframe, icmp_len));
-        frame_len = compose_ethernet_frame(frame, &tempeth, icmpframe, icmp_len);
-        printf("    eth frame: %s\n", binary_to_hex(frame, frame_len));
-
-
-
-        // reroute, send it back
-        if((r2 = lookup_route(ntohl(ip->srcAddress))) == NULL){
-            printf(" could not find return route");
-            return -1;
-        }
-        send_ethernet_frame(r2->iface -> out_fd, frame, frame_len);
+        send_ICMP(icmp, packet, packet_len);
+        free(icmp);
         return -1;
     }
 
@@ -173,7 +152,7 @@ int route_packet(uint8_t *packet, ssize_t packet_len){
     // Determines if packet is meant for a device directly connected to network
     if(r->gateway == 0x00000000){
         printf("  destination host is on attached network\n");
-        destethaddr = arp_lookup(ntohl(ip->dstAddress));
+        destethaddr = arp_lookup(ip->dstAddress);
     }
     else{
         // finds gateway network address in ARP to forward packets
@@ -182,6 +161,12 @@ int route_packet(uint8_t *packet, ssize_t packet_len){
     }
     if(destethaddr == NULL){
         printf("  dropping packet: no ARP. Host Unreachable.\n");
+        icmp = malloc(sizeof(icmp));
+        icmp->type = 3;
+        icmp->code = 1;
+        icmp->checksum = 0;
+        send_ICMP(icmp, packet, packet_len);
+        free(icmp);
         return 0;
     }
 
@@ -190,8 +175,9 @@ int route_packet(uint8_t *packet, ssize_t packet_len){
     memcpy(tempeth.dst_addr, destethaddr, 6);
     memcpy(tempeth.src_addr,r->iface->eth_addr, 6);
     tempeth.type = htons(ETH_TYPE_IP);
+    uint8_t frame[ETH_MAX_FRAME_LEN];
 
-     frame_len = compose_ethernet_frame(frame, &tempeth, packet, packet_len-4);
+    frame_len = compose_ethernet_frame(frame, &tempeth, packet, packet_len);
 
     // printf("frame_len = %d\n", frame_len);
     // Send frame to next interface
@@ -211,14 +197,45 @@ lookup_route(uint32_t destip){
         // printf("destip & netmask: %08x\n", (destip & routingTbl[i].netmask));
 
         //use bitwise and to find destination network address
-        if((destip & routingTbl[i].netmask) ==routingTbl[i].destination){
+        if((destip & routingTbl[i].netmask) == routingTbl[i].destination){
             return &routingTbl[i];
         }
     }
     printf("Could not find route\n");
     return NULL;
 }
+int 
+send_ICMP(struct icmpheader *icmp, uint8_t * packet, ssize_t packet_len){
+    struct route * r;
+    size_t icmp_len;
+    uint8_t icmpframe[ETH_MAX_FRAME_LEN];    
+    uint8_t frame[ETH_MAX_FRAME_LEN];
+    struct eth_header tempeth;
+    struct IPheader *ip = (struct IPheader *)packet;
+    size_t frame_len;
 
+    
+    // if(() == NULL){
+    //     printf(" could not find return ip");
+    //     return -1;
+    // }
+    r = lookup_route(ntohl(ip->srcAddress));
+
+    memcpy (tempeth.dst_addr, arp_lookup(ip->srcAddress), 6); // destination eth
+    memcpy (tempeth.src_addr, r-> iface -> eth_addr, 6); // source eth
+    tempeth.type = htons(ETH_TYPE_IP);
+
+
+    icmp_len = compose_ICMP_frame(icmpframe, icmp, packet, packet_len);
+    // printf("    icmp frame: %s\n", binary_to_hex(icmpframe, icmp_len));
+    frame_len = compose_ethernet_frame(frame, &tempeth, icmpframe, icmp_len);
+    // printf("    eth frame: %s\n", binary_to_hex(frame, frame_len));
+
+
+    // reroute, send it back
+    send_ethernet_frame(r->iface -> out_fd, frame, frame_len);
+    return 0;
+}
 uint16_t 
 compute_headchksum(struct IPheader *ip){
     // ones complement of sum of ones complement of each octet

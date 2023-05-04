@@ -32,6 +32,7 @@ handle_ethernet_frame(struct interface *iface){
     char *hexsrc;
     uint8_t *payload;
     int payload_len;
+    int isbroadcast = 0;
 
     
     // receive eth_frame and divide into eh frame struct
@@ -50,7 +51,7 @@ handle_ethernet_frame(struct interface *iface){
     checkfcs = crc32(0, (void *) frame, frame_len - 4);
     memcpy(hexfcs, &checkfcs, sizeof(uint32_t));
 
-    if(frame_len<64){
+    if(frame_len<ETH_MIN_DATA_LEN){
         printf("  ignoring %zd-byte frame (too short)\n", frame_len);
         return -1;
     }
@@ -63,16 +64,17 @@ handle_ethernet_frame(struct interface *iface){
 
     // Broadcast frame
     else if((memcmp(eh->dst_addr, broadcast, 6)) == 0){
+        isbroadcast = 1;
         printf("  received %zd-byte broadcast frame from %s\n", frame_len, hexsrc);
-        return 0;
     }
 
     free(hexsrc);
 
     
-
+    payload = frame + sizeof(struct eth_header);
+    payload_len = frame_len - sizeof(struct eth_header);
     // determines if address if for 
-    if(memcmp(eh->dst_addr, iface->eth_addr, 6)==0){
+    if(memcmp(eh->dst_addr, iface->eth_addr, 6)==0 || isbroadcast == 1){
         char *hexmac = binary_to_hex(eh->src_addr, 7);
         printf("  frame is for me, from %s\n", hexmac);
         free(hexmac);
@@ -82,12 +84,11 @@ handle_ethernet_frame(struct interface *iface){
             // handle IP packet with payload
             case ETH_TYPE_IP:    printf("  has type ip\n"); 
                 // divide frame into payload to pass to ip
-                payload = frame + sizeof(struct eth_header);
-                payload_len = frame_len - sizeof(struct eth_header);
                 handle_ip_packet(iface, payload, payload_len);
                 break;
 
             case ETH_TYPE_ARP:  printf("  has type arp\n");
+                handle_arp_packet(iface, payload, payload_len);
                 break;
 
             default: printf("  dropping frame, unknown type\n");
@@ -102,6 +103,7 @@ handle_ethernet_frame(struct interface *iface){
     }
     return 1;
 }
+
 int
 compose_ethernet_frame(uint8_t *frame, struct eth_header *eh, uint8_t *data, size_t data_len){
     uint32_t fcs;
@@ -113,8 +115,9 @@ compose_ethernet_frame(uint8_t *frame, struct eth_header *eh, uint8_t *data, siz
 
 
     // enter eth header and data into frame
-    memcpy(frame, eh, sizeof(*eh));
-    memcpy(frame + sizeof(*eh), data, data_len);
+    memcpy(frame, eh, sizeof(*eh));     // 8
+    memcpy(frame + sizeof(*eh), data, data_len); // 
+
 
     // fill in the rest of the frame if too little data
     if(data_len <ETH_MIN_DATA_LEN){
