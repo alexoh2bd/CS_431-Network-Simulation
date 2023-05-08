@@ -60,12 +60,12 @@ main(int argc, char *argv[])
 
 
                         "\x11\x22\x33\xaa\xbb\xcc"  // |    Dest ETH address        |
-                        "\x77\x88\x99\xdd\xee\xff"  // |    Source eth address      |
+                        "\x45\x45\x45\x45\x45\x15"  // |    Source eth address      |
                         "\x08\x00"                  // |    IP Type        |
                         "\x45\x14\x00\x94"          // | Version | IHL | Type of Service | Total Length    |
                         "\xff\xff\xff\xff"          // |       ID     | Flags     |      Fragment offset   |
-                        "\x10\x02\xf2\x8c"          // | Time to Live  | Protocol  | Header Checksum       |
-                        "\x08\x10\x20\x40"          // |     Source Address          | 
+                        "\x10\x02\xf2\x74"          // | Time to Live  | Protocol  | Header Checksum       |
+                        "\x20\x10\x20\x40"          // |     Source Address          | 
                         "\x45\x45\xaf\xcd"          // |     Destination Address     |
                         "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
                         "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
@@ -75,7 +75,7 @@ main(int argc, char *argv[])
                         "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
                         "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
                         "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"    
-                        "\xe0\xc3\xc5\x00" // |     Frame Check Sequence|
+                        "\xe9\xb4\x0b\xa4" // |     Frame Check Sequence|
 
 // checking ttl
                         // "\x11\x22\x33\xaa\xbb\xcc"  // |    Dest ETH address        |

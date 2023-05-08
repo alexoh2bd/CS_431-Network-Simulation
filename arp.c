@@ -32,7 +32,7 @@ int add_arp(uint8_t *eth_addr, uint32_t ip_addr){
         if(arpTbl[i].eth == NULL){
             arpTbl[i].eth = malloc(6);
             memcpy(arpTbl[i].eth, eth_addr, 6);
-            arpTbl[i].ip = ntohl(ip_addr);
+            arpTbl[i].ip = (ip_addr);
             return 0;
         }
     }
@@ -49,7 +49,7 @@ uint8_t *arp_lookup(uint32_t ip){
             return arpTbl[i].eth;
         }
     }
-    printf("could not find arp for %08X\n", ntohl(ip));
+    printf("could not find arp for %08X\n", (ip));
     return NULL;
 
 }
@@ -65,12 +65,12 @@ handle_arp_packet(struct interface *iface, uint8_t *packet, int packet_len){
         struct eth_header *eh = malloc(sizeof(struct eth_header));
         memcpy(eh-> dst_addr, (arp->sendereth), 6);
         memcpy(eh-> src_addr, iface->eth_addr, 6);
-        eh->type = htons(ETH_TYPE_ARP);
+        eh->type = (ETH_TYPE_ARP);
 
 
         // change sender mac and ip addresses and target mac address
-        arp->opcode = htons((uint16_t)2); 
-        uint32_t tempip = htonl(iface->ip_addr);
+        arp->opcode = ((uint16_t)2); 
+        uint32_t tempip = (iface->ip_addr);
         
         memcpy(arp->sendereth, &iface->eth_addr, 6);
         memcpy(arp->senderip, &tempip, 4);

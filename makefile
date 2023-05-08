@@ -23,7 +23,7 @@ senders: sender1a sender2a
 
 
 
-stack: stack.o util.o cs431vde.o crc32.o ethernet.o ip.o arp.o 
+stack: stack.o util.o cs431vde.o crc32.o ethernet.o ip.o arp.o  
 	gcc $(CFLAGS) -o $@ $^
 
 hexdump: hexdump.o util.o

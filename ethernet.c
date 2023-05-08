@@ -12,6 +12,7 @@
 #include "stack.h"
 #include "ethernet.h"
 #include "ip.h"
+#include "arp.h"
 
 
 
@@ -34,12 +35,13 @@ handle_ethernet_frame(struct interface *iface){
     int payload_len;
     int isbroadcast = 0;
 
-    
     // receive eth_frame and divide into eh frame struct
     frame_len = receive_ethernet_frame(iface->in_fd, frame);
     eh = (struct eth_header *) frame;
+    printf("frame: %s\n", binary_to_hex(frame, frame_len));
     hexsrc = binary_to_hex(eh->src_addr, 7);
     printf("received %ld byte frame on interface %s\n", frame_len, iface->name);
+    printf("eh type: %04x\n", eh->type);
 
 
     // ETHERNET FRAME BREAKDOWN
@@ -67,7 +69,9 @@ handle_ethernet_frame(struct interface *iface){
         isbroadcast = 1;
         printf("  received %zd-byte broadcast frame from %s\n", frame_len, hexsrc);
     }
-
+    else if(memcmp(eh->dst_addr, iface->eth_addr, 6) != 0){
+        printf("  ignoring %zd-byte broadcast frame (mismatching MAC address)\n", frame_len);
+    }
     free(hexsrc);
 
     
@@ -79,7 +83,7 @@ handle_ethernet_frame(struct interface *iface){
         char *hexmac = binary_to_hex(eh->src_addr, 7);
         printf("  frame is for me, from %s\n", hexmac);
         free(hexmac);
-
+        printf("eth typ: %04X\n", eh->type);
         // check type of address
         switch (ntohs(eh->type)){
             // handle IP packet with payload

@@ -35,19 +35,22 @@ int main(int argc, char *argv[])
     arp_init();
 
     memset(interfaces, '\0', sizeof(interfaces));
-    add_interface("/tmp/net1.vde", (uint8_t *) "\x11\x22\x33\xaa\xbb\xcc", 0x77102040, "interface1");
-    add_interface("/tmp/net2.vde", (uint8_t *) "\x10\x10\x10\x10\x10\x10", 0x2235afcd, "interface2");
+    add_interface("/tmp/net1.vde", (uint8_t *) "\x11\x22\x33\xaa\xbb\xcc", 0x40201077, "interface1");
+    add_interface("/tmp/net2.vde", (uint8_t *) "\x10\x10\x10\x10\x10\x10", 0xcdaf3522, "interface2");
 
    
-    add_route(0x00102040, 0x00ffffff, 0x00000000, &interfaces[0]);  // network 1: sender1a
-    add_route(0x0035afcd, 0x00ffffff, 0x00000000, &interfaces[1]);  // network 2: sender2a
-    add_route(0x0045afcd, 0x00ffffff, 0x4545afcd, &interfaces[1]);  // network 2: gateway test
+    add_route(0x40201000, 0xffffff00, 0x00000000, &interfaces[0]);  // network 1: sender1s
+    add_route(0xcdaf3500, 0xffffff00, 0x00000000, &interfaces[1]);  // network 2: sender2a
+
+    add_route(0xcdaf4500, 0xffffff00, 0xcdaf4545, &interfaces[1]);  // network 2: gateway test
 
 
     // |  eth address | ip address |
-    add_arp((uint8_t *) "\x77\x88\x99\xdd\xee\xff", 0x08102040);    // sender1a
-    add_arp((uint8_t *) "\x50\x50\x50\x50\x50\x10", 0x3535afcd);    // sender2a
-    add_arp((uint8_t *) "\x40\x40\x40\x40\x40\x40", 0x4545afcd);    // sender2b
+    add_arp((uint8_t *) "\x77\x88\x99\xdd\xee\xff", 0x40201008);    // sender1a
+    add_arp((uint8_t *) "\x45\x45\x45\x45\x45\x15", 0x40201020);    // sender1b
+
+    add_arp((uint8_t *) "\x50\x50\x50\x50\x50\x10", 0xcdaf3535);    // sender2a
+    add_arp((uint8_t *) "\x40\x40\x40\x40\x40\x40", 0xcdaf4545);    // sender2b
 
     //  ASSIGNMENT 3 POLLLLS
     struct pollfd fds[num_interfaces];
@@ -100,8 +103,8 @@ add_interface(char *vde_control_file, uint8_t *eth_addr, uint32_t ip_addr, char 
 
     // set all interface values
     memcpy(iface->eth_addr, eth_addr, 6);
-    iface->ip_addr = ip_addr;
-    iface->name = strdup(name);
+    iface -> ip_addr = ip_addr;
+    iface -> name = strdup(name);
     iface -> in_fd = fds[0];
     iface -> out_fd = fds[1];
     

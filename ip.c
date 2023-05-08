@@ -39,7 +39,6 @@ int handle_ip_packet(struct interface *iface, uint8_t *packet, int packet_len){
     uint16_t checksum_should_be;
 
 
-    char *hexsrcaddress = binary_to_hex(&ip->srcAddress, 5);
     char *hexdestaddress = binary_to_hex(&ip->dstAddress, 5);
 
     // take out fcs count
@@ -47,18 +46,17 @@ int handle_ip_packet(struct interface *iface, uint8_t *packet, int packet_len){
 
 
     // printf("net to host: %04x\n", ntohs(ip->headchksum));
-    // printf("host to net :   %04x\n", htons(ip->headchksum));
+    // printf("host to net :   %04x\n", htons(ip->headchksum));     
 
     // printf("ip->length = %04x\n", ntohs(ip->length));
     // printf("packet length = %04x\n",packet_len);
 
     // Time to live = 0
  
-
     // Length of IP packet does not match
-    printf("packet length = %04x\n",packet_len);
+    printf("packet length = %04X\n",ip->length);
     if(packet_len < ntohs(ip->length)){
-        printf("Dropping packet from %s (is %04x, should be: %04x)\n", hexsrcaddress,  ntohs(ip->length), packet_len);
+        printf("Dropping packet: wrong length (is %04x, should be: %04x)\n",   ntohs(ip->length), packet_len);
         return -1;
     }
 
@@ -76,6 +74,7 @@ int handle_ip_packet(struct interface *iface, uint8_t *packet, int packet_len){
     }
 
     printf("Routing packet to %s\n", hexdestaddress);
+    free(hexdestaddress);
     return route_packet(packet, packet_len);
 }
 
@@ -114,7 +113,7 @@ int route_packet(uint8_t *packet, ssize_t packet_len){
 
 
     // find eth address associated with MAC address
-    r = lookup_route(ntohl(ip->dstAddress));
+    r = lookup_route(ip->dstAddress);
     if(r == NULL){
         icmp = malloc(sizeof(icmp));
         printf("  dropping packet: no matching route. Network Unreachable.\n");
@@ -131,7 +130,7 @@ int route_packet(uint8_t *packet, ssize_t packet_len){
     printf("  route is dest: %08x, nm: %08x, r->gateway: %08x\n", r->destination, r->netmask, r->gateway);
 
 
-    if(ip->ttl <= 0){
+    if(ip->ttl <= 0){   
         printf("Dropping packet, (TTL exceeded)\n");
         icmp = malloc(sizeof(icmp));
         // set ICMP values
@@ -157,7 +156,7 @@ int route_packet(uint8_t *packet, ssize_t packet_len){
     else{
         // finds gateway network address in ARP to forward packets
         printf("  packet must be routed\n");
-        destethaddr = arp_lookup(ntohl(r->gateway));
+        destethaddr = arp_lookup(r->gateway);
     }
     if(destethaddr == NULL){
         printf("  dropping packet: no ARP. Host Unreachable.\n");
@@ -174,7 +173,7 @@ int route_packet(uint8_t *packet, ssize_t packet_len){
     // Create new eth_frame to pass on to next interface/host
     memcpy(tempeth.dst_addr, destethaddr, 6);
     memcpy(tempeth.src_addr,r->iface->eth_addr, 6);
-    tempeth.type = htons(ETH_TYPE_IP);
+    tempeth.type = (ETH_TYPE_IP);
     uint8_t frame[ETH_MAX_FRAME_LEN];
 
     frame_len = compose_ethernet_frame(frame, &tempeth, packet, packet_len);
@@ -215,15 +214,18 @@ send_ICMP(struct icmpheader *icmp, uint8_t * packet, ssize_t packet_len){
     size_t frame_len;
 
     
-    // if(() == NULL){
-    //     printf(" could not find return ip");
-    //     return -1;
-    // }
-    r = lookup_route(ntohl(ip->srcAddress));
+    r = lookup_route(ip->srcAddress);
+    uint8_t *temparp ;
+    temparp = malloc(6);
+    temparp = arp_lookup(ip->srcAddress);
+    if(temparp == NULL){
+        printf("Couldn't find ARP entry for IP: %08X\n", ip->srcAddress);
+        return -1;
+    }
 
-    memcpy (tempeth.dst_addr, arp_lookup(ip->srcAddress), 6); // destination eth
+    memcpy (tempeth.dst_addr, temparp, 6); // destination eth
     memcpy (tempeth.src_addr, r-> iface -> eth_addr, 6); // source eth
-    tempeth.type = htons(ETH_TYPE_IP);
+    tempeth.type = (ETH_TYPE_IP);
 
 
     icmp_len = compose_ICMP_frame(icmpframe, icmp, packet, packet_len);
@@ -242,7 +244,8 @@ compute_headchksum(struct IPheader *ip){
     int  ihl;
     ihl = (ip->ihl & 0xf)* 4;
     
-    uint16_t *s = ip;
+    uint16_t *s;
+    s = (uint16_t *)ip;
     uint32_t sum = 0;
     uint16_t checksum;
     while(ihl > 1) {
@@ -267,14 +270,13 @@ int verify_checksum(struct IPheader *ip, uint16_t *shouldbe){
     int ihl;
     uint16_t calculated_checksum;
 
-    // printf("      ip->checksum: %04x\n", ntohs(ip->headchksum));
     // use IP header length to compute checksum
     ihl = (ip->ihl & 0xf) * 4;
     memcpy (&tempih, ip, ihl);
     tempih.headchksum = 0;
     calculated_checksum = compute_headchksum(&tempih);
     
-    if(calculated_checksum != ntohs(ip->headchksum)){
+    if(calculated_checksum != (ip->headchksum)){
         if(shouldbe){
             *shouldbe = calculated_checksum;
         }
@@ -289,7 +291,8 @@ uint16_t compute_icmp_checksum(struct icmpheader *icmp){
     int  ihl;
     ihl = 8;
     
-    uint16_t *s = icmp;
+    uint16_t *s;
+    s = (uint16_t *)icmp;
     uint32_t sum = 0;
     uint16_t checksum;
     while(ihl > 1) {
