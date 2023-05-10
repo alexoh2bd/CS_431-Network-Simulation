@@ -16,7 +16,7 @@ char *binary_to_hex(void *data, ssize_t n){
     
     while(i < n){
         
-        sprintf(ret+i, "%02x", *(char *)(data+ j));
+        sprintf(ret+i, "%02x", *((char *)data+ j));
         i+=2;
         j+=1;
 
@@ -70,7 +70,7 @@ void *hex_to_binary(char *hex){
     int k = 0;
     // uses int array to set hex value
     while(j < n){
-        *(char *)(ret + j) = (char)(arr[k] * 16 + arr[k+1]);
+        *((char *)ret + j) = (char)(arr[k] * 16 + arr[k+1]);
        // printf("%s", (ret+ j));
         j ++;
         k+=2;

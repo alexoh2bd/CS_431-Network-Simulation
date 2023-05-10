@@ -1,4 +1,4 @@
-CFLAGS = -g -Wall -pedantic -Wno-pointer-arith
+CFLAGS = -g -Wall -pedantic 
 
 # VPATH = src/ethernet-study
 # DIR = cs431/ethernet-study

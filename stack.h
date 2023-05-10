@@ -13,9 +13,6 @@ struct interface {
     int         out_fd;
 };
 
-#define ETH_TYPE_IP 0x0800
-#define ETH_TYPE_ARP 0x0806
-
 
 #define MAX_INTERFACES 5
 #endif

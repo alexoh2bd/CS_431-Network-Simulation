@@ -38,9 +38,9 @@ main(int argc, char *argv[])
                         "\x08\x00"
                         "\x45\x14\x00\x90" // | Version | IHL | Type of Service | Total Length    |
                         "\xff\xff\xff\xff" // |       ID     | Flags     |      Fragment offset   |
-                        "\x10\x02\x9d\x06" // | Time to Live  | Protocol  | Header Checksum       |
-                        "\x35\x35\xaf\xcd" // |     Source Address          | 
-                        "\x08\x10\x20\x40" // |     Destination Address     |
+                        "\x10\x02\x57\x4c" // | Time to Live  | Protocol  | Header Checksum       |
+                        "\xcd\xaf\x35\x35" // |     Source Address          | 
+                        "\x40\x20\x10\x08" // |     Destination Address     |
                         "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
                         "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
                         "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
@@ -49,7 +49,7 @@ main(int argc, char *argv[])
                         "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
                         "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
                         "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb"
-                        "\x09\xdf\x58\xe0"         
+                        "\x7f\xb9\xcc\xab"         
     };
 
     send_ethernet_frame(fds[1], frame, 162);

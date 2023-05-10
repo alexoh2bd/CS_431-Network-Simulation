@@ -38,10 +38,11 @@ int add_arp(uint8_t *eth_addr, uint32_t ip_addr){
     }
     return -1;
 }
-
+// takes host(little endian) address as argument
 uint8_t *arp_lookup(uint32_t ip){
     // search by ip address
-    printf("IP: %08X\n", ip);
+    ip = htonl(ip);
+    // printf("IP: %08X\n", ip);
     for(int i = 0; i < ARP_CACHE_SIZE; i++){
         // printf("arbtbl[%d]: %08X    \n", i, arpTbl[i].ip);
         if(arpTbl[i].ip == ip){
@@ -65,11 +66,11 @@ handle_arp_packet(struct interface *iface, uint8_t *packet, int packet_len){
         struct eth_header *eh = malloc(sizeof(struct eth_header));
         memcpy(eh-> dst_addr, (arp->sendereth), 6);
         memcpy(eh-> src_addr, iface->eth_addr, 6);
-        eh->type = (ETH_TYPE_ARP);
+        eh->type = (0x0608);
 
 
         // change sender mac and ip addresses and target mac address
-        arp->opcode = ((uint16_t)2); 
+        arp->opcode = (0x0200); 
         uint32_t tempip = (iface->ip_addr);
         
         memcpy(arp->sendereth, &iface->eth_addr, 6);

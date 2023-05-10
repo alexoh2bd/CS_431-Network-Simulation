@@ -11,6 +11,12 @@ struct eth_header{
 
 };
 
+#define ETH_TYPE_IP 0x0800
+#define ETH_TYPE_ARP 0x0806
+
+#define little_ETH_TYPE_IP 0x0008
+#define little_ETH_TYPE_ARP 0x0608
+
 
 #define ETH_MIN_DATA_LEN 46
 #define ETH_MAX_DATA_LEN 1500
