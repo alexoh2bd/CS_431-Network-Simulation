@@ -232,7 +232,7 @@ send_ICMP(struct icmpheader *icmp, uint8_t * packet, ssize_t packet_len){
     }
 
     // ICMP header
-    icmp_len = compose_ICMP_frame(icmpframe, icmp, packet+ sizeof(struct IPheader), packet_len- sizeof(struct IPheader));
+    icmp_len = compose_ICMP_frame(icmpframe, icmp, packet, packet_len);
     // printf("    icmp frame: %s\n", binary_to_hex(icmpframe, icmp_len));
 
     // IP header
