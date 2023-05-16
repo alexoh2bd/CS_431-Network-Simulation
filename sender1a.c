@@ -63,11 +63,11 @@ main(int argc, char *argv[])
                         "\x45\x45\x45\x45\x45\x15"  // |    Source eth address      |
                         "\x08\x00"                  // |    IP Type        |
                         "\x45\x14\x00\x94"          // | Version | IHL | Type of Service | Total Length    |
-                        "\xff\xff\xff\xff"          // |       ID     | Flags     |      Fragment offset   |
-                        "\x10\x02\x8c\xf2"          // | Time to Live  | Protocol  | Header Checksum       |
+                        "\x00\x00\x00\x00"          // |       ID     | Flags     |      Fragment offset   |
+                        "\x10\x01\x8c\xf3"          // | Time to Live  | Protocol  | Header Checksum       |
                         "\x08\x10\x20\x40"          // |     Source Address          | 
                         "\x45\x45\xaf\xcd"          // |     Destination Address     |
-                        "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        "\x00\x11\x40\x15\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
                         "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
                         "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
                         "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
@@ -75,26 +75,45 @@ main(int argc, char *argv[])
                         "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
                         "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
                         "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"    
-                        "\x79\x0b\x0b\x35" //           |     Frame Check Sequence   |
+                        "\x35\x7f\xea\xb5" //           |     Frame Check Sequence   |
 
                         // checking ttl
                         // "\x11\x22\x33\xaa\xbb\xcc"  // |    Dest ETH address        |
                         // "\x77\x88\x99\xdd\xee\xff"  // |    Source eth address      |
                         // "\x08\x00"                  // |    Type        |
                         // "\x45\x00\x00\x94"          // | Version | IHL | Type of Service | Total Length    |
-                        // "\xff\xff\xff\xff"          // |       ID     | Flags     |      Fragment offset   |
+                        // "\x00\x00\x00\x00"          // |       ID     | Flags     |      Fragment offset   |
                         // "\x01\x01\xac\x17"          // | Time to Live  | Protocol  | Header Checksum       |
                         // "\x08\x10\x20\x40"          // |     Source Address          | 
                         // "\x35\x35\xaf\xcd"          // |     Destination Address     |
-                        // "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
-                        // "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
-                        // "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
-                        // "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
-                        // "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
-                        // "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
-                        // "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
-                        // "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"    
-                        // "\x59\xc7\x2a\x26" 
+                        // "\x08\x00\x40\x4e\xaf\x04\x00\x00"
+                        // "\x01\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xf1"
+                        // "\x02\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xf2"
+                        // "\x03\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xf3"
+                        // "\x04\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xf4"
+                        // "\x05\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xf5"
+                        // "\x06\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xf6"
+                        // "\x07\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xf7"
+                        // "\x08\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xf8"    
+                        // "\x02\x0f\x0b\x51" 
+
+
+
+// "\x11\x22\x33\xaa\xbb\xcc"  // |    Dest ETH address        |
+//                         "\x77\x88\x99\xdd\xee\xff"  // |    Source eth address      |
+//                         "\x08\x00" 
+//                         "\x45\x00\x00\x94"          // | Version | IHL | Type of Service | Total Length    |
+//                         "\x00\x00\x00\x00"          // |       ID     | Flags     |      Fragment offset   |
+//                         "\x01\x01\xac\x17"          // | Time to Live  | Protocol  | Header Checksum       |
+//                         "\x08\x10\x20\x40"          // |     Source Address          | 
+//                         "\x35\x35\xaf\xcd" 
+// "\x08\x00\x40\x4e\xaf\x04\x00\x00\x00\x00\x24\x93\x32\x47  
+// \xc6\xcf\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15
+// \x16\x17\x1819 1a 1b 1c 1d 1e 1f 20 21 22 23 24 25  
+// 26 27 28 29 2a 2b 2c 2d 2e 2f 30 31 32 33 34 35  
+//  36 37"                                     
+
+
     };
     int frame_len;
     char * data_as_hex;

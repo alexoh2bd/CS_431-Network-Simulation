@@ -134,6 +134,7 @@ compose_ethernet_frame(uint8_t *frame, struct eth_header *eh, uint8_t *data, siz
     // add fcs
     fcs = crc32(0, frame, sizeof(struct eth_header) + data_len);
     memcpy(frame+ sizeof(*eh) + data_len, &fcs, ETH_FCS_LEN);
+    // printf("fcs: %04X\n", fcs);
 
     // return total length of frame
     return sizeof(*eh) + data_len + ETH_FCS_LEN;
