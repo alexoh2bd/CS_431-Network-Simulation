@@ -103,7 +103,7 @@ int route_packet(uint8_t *packet, ssize_t packet_len){
     struct eth_header tempeth;
     size_t frame_len;
     
-
+    ip->tos = 0;
     ip->ttl--;
     ip->headchksum = 0;
     ip->headchksum = compute_headchksum(ip);
@@ -189,7 +189,7 @@ int route_packet(uint8_t *packet, ssize_t packet_len){
 // takes in host(little endian) ip address as argument
 struct route *
 lookup_route(uint32_t destip){
-    // destip = htonl(destip);
+    destip = htonl(destip);
     for(int i = 0; i< MAX_ROUTES&& routingTbl[i].iface; i++){  
         // printf("route: %08x\n", routingTbl[i].destination);
         // printf("destip & netmask: %08x\n", (destip & routingTbl[i].netmask));
@@ -234,28 +234,29 @@ send_ICMP(struct icmpheader *icmp, uint8_t * packet, ssize_t packet_len){
     if(packet_len > 8 +sizeof(*ip)){
         packet_len = 8+sizeof(*ip);
     }
-    printf("packet:\n %s\n", binary_to_hex(packet, packet_len));
-    printf("packet length: %d\n", packet_len);
+    // printf("packet:\n %s\n", binary_to_hex(packet, packet_len));
+    // printf("packet length: %d\n", packet_len);
 
 
     // IP header
+    ip->ttl++;
     ip->length = htons(packet_len);
     ip->headchksum = 0;
     ip->headchksum = compute_headchksum(ip);
     
     // compose ICMP header 
     icmp_len = compose_ICMP_frame(icmpframe, icmp, packet, ntohs(ip->length));
-    printf("icmp length: %d\n", icmp_len);
+    // printf("icmp length: %d\n", icmp_len);
 
 
     ip->protocol = 0x01;
     ip->ttl = 0x10;
-    uint32_t tempdestip = ip->dstAddress;
+    // uint32_t tempdestip = ip->dstAddress;
     ip->dstAddress = ip->srcAddress;
-    ip->srcAddress = tempdestip;
+    ip->srcAddress = r->iface->ip_addr;
     ip->length = htons(icmp_len + sizeof(*ip));
 
-    printf("ip length : %d\n", htons(ip->length));
+    // printf("ip length : %d\n", htons(ip->length));
 
     ip->headchksum = 0;
     ip->headchksum = compute_headchksum(ip);
@@ -271,9 +272,9 @@ send_ICMP(struct icmpheader *icmp, uint8_t * packet, ssize_t packet_len){
 
 
     frame_len = compose_ethernet_frame(frame, tempeth, ipframe, htons(ip->length));
-    printf("    eth frame: %s\n", binary_to_hex(frame, frame_len));
+    // printf("    eth frame: %s\n", binary_to_hex(frame, frame_len));
     // reroute, send it back
-    printf("sending icmp frame to %s\n", binary_to_hex(tempeth->dst_addr, 7));
+    // printf("sending icmp frame to %s\n", binary_to_hex(tempeth->dst_addr, 7));
     free(tempeth);
 
     send_ethernet_frame(r->iface -> out_fd, frame, frame_len);
@@ -343,14 +344,14 @@ uint16_t compute_icmp_checksum(struct icmpheader *icmp, uint8_t *data, size_t da
     uint8_t tempframe [size+1];
     memcpy(tempframe, icmp, icmpsize);
     memcpy(tempframe+icmpsize, data, data_len);
-    printf("size: %d\n", size);
-    printf("data_len: %d\n", data_len);
+    // printf("size: %d\n", size);
+    // printf("data_len: %d\n", data_len);
 
     uint16_t *s;
     s = (uint16_t *)tempframe;
 
-    printf("%d\n ", data_len);
-    printf("tempframe: %s\n", binary_to_hex(tempframe , size));
+    // printf("%d\n ", data_len);
+    // printf("tempframe: %s\n", binary_to_hex(tempframe , size));
     while(size > 1) {
         sum+=(uint16_t) *s;
         size -=2;
@@ -361,10 +362,10 @@ uint16_t compute_icmp_checksum(struct icmpheader *icmp, uint8_t *data, size_t da
     }
     while(sum >> 16){
         sum = (sum &0xffff) + (sum>>16);
-        printf("sum: %04X\n", ~sum);
+        // printf("sum: %04X\n", ~sum);
     }
     checksum = ~sum & 0xffff;
-    printf("checksum %04X\n", checksum);
+    // printf("checksum %04X\n", checksum);
     return checksum;
 }
 int compose_ICMP_frame(uint8_t *frame, struct icmpheader *icmp, uint8_t *data, size_t data_len){
@@ -378,7 +379,7 @@ int compose_ICMP_frame(uint8_t *frame, struct icmpheader *icmp, uint8_t *data, s
     memcpy(frame + sizeof(*icmp), data, data_len);
 
     // printf("icmp checksum: %04X\n", icmp->checksum);
-    printf("icmp frame: %s\n", binary_to_hex(frame, data_len+ sizeof(struct icmpheader)));
+    // printf("icmp frame: %s\n", binary_to_hex(frame, data_len+ sizeof(struct icmpheader)));
     // printf("frame: %s\n", binary_to_hex(frame, data_len + sizeof(*icmp)));
 
 

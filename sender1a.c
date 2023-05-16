@@ -59,43 +59,43 @@ main(int argc, char *argv[])
 
 
                         // no route
-                        // "\x11\x22\x33\xaa\xbb\xcc"  // |    Dest ETH address        |
-                        // "\x45\x45\x45\x45\x45\x15"  // |    Source eth address      |
-                        // "\x08\x00"                  // |    IP Type        |
-                        // "\x45\x14\x00\x94"          // | Version | IHL | Type of Service | Total Length    |
-                        // "\x00\x00\x00\x00"          // |       ID     | Flags     |      Fragment offset   |
-                        // "\x10\x01\x8c\xf3"          // | Time to Live  | Protocol  | Header Checksum       |
-                        // "\x08\x10\x20\x40"          // |     Source Address          | 
-                        // "\x45\x45\xaf\xcd"          // |     Destination Address     |
-                        // "\x00\x11\x40\x15\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
-                        // "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
-                        // "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
-                        // "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
-                        // "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
-                        // "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
-                        // "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
-                        // "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"    
-                        // "\x35\x7f\xea\xb5" //           |     Frame Check Sequence   |
+                        "\x11\x22\x33\xaa\xbb\xcc"  // |    Dest ETH address        |
+                        "\x45\x45\x45\x45\x45\x15"  // |    Source eth address      |
+                        "\x08\x00"                  // |    IP Type        |
+                        "\x45\x14\x00\x94"          // | Version | IHL | Type of Service | Total Length    |
+                        "\x00\x00\x00\x00"          // |       ID     | Flags     |      Fragment offset   |
+                        "\x10\x01\x8c\xf3"          // | Time to Live  | Protocol  | Header Checksum       |
+                        "\x08\x10\x20\x40"          // |     Source Address          | 
+                        "\x45\x45\xaf\xcd"          // |     Destination Address     |
+                        "\x00\x11\x40\x15\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+                        "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"    
+                        "\x35\x7f\xea\xb5" //           |     Frame Check Sequence   |
 
                         // checking ttl
-                        "\x11\x22\x33\xaa\xbb\xcc"  // |    Dest ETH address        |
-                        "\x77\x88\x99\xdd\xee\xff"  // |    Source eth address      |
-                        "\x08\x00"                  // |    Type        |
-                        "\x45\x00\x00\x94"          // | Version | IHL | Type of Service | Total Length    |
-                        "\x00\x00\x00\x00"          // |       ID     | Flags     |      Fragment offset   |
-                        "\x10\x01\x9d\x17"          // | Time to Live  | Protocol  | Header Checksum       |
-                        "\x08\x10\x20\x40"          // |     Source Address          | 
-                        "\x35\x35\xaf\xcd"          // |     Destination Address     |
-                        "\x08\x00\x32\x5d\xaf\x04\x00\x00"
-                        "\x01\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xf1"
-                        "\x02\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xf2"
-                        "\x03\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xf3"
-                        "\x04\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xf4"
-                        "\x05\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xf5"
-                        "\x06\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xf6"
-                        "\x07\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xf7"
-                        "\x08\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xf8"    
-                        "\x43\xaf\xf0\x83" 
+                        // "\x11\x22\x33\xaa\xbb\xcc"  // |    Dest ETH address        |
+                        // "\x77\x88\x99\xdd\xee\xff"  // |    Source eth address      |
+                        // "\x08\x00"                  // |    Type        |
+                        // "\x45\x00\x00\x94"          // | Version | IHL | Type of Service | Total Length    |
+                        // "\x00\x00\x00\x00"          // |       ID     | Flags     |      Fragment offset   |
+                        // "\x10\x01\x9d\x17"          // | Time to Live  | Protocol  | Header Checksum       |
+                        // "\x08\x10\x20\x40"          // |     Source Address          | 
+                        // "\x35\x35\xaf\xcd"          // |     Destination Address     |
+                        // "\x08\x00\x32\x5d\xaf\x04\x00\x00"
+                        // "\x01\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xf1"
+                        // "\x02\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xf2"
+                        // "\x03\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xf3"
+                        // "\x04\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xf4"
+                        // "\x05\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xf5"
+                        // "\x06\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xf6"
+                        // "\x07\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xf7"
+                        // "\x08\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xf8"    
+                        // "\x43\xaf\xf0\x83" 
 
 
 
@@ -118,7 +118,7 @@ main(int argc, char *argv[])
     int frame_len;
     char * data_as_hex;
 
-    send_ethernet_frame(fds[1], frame, 174);
+    send_ethernet_frame(fds[1], frame, 166);
 
     while((frame_len = receive_ethernet_frame(fds[0], frame)) > 0) {
         data_as_hex = binary_to_hex(frame, frame_len+4);
