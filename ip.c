@@ -175,7 +175,7 @@ int route_packet(uint8_t *packet, ssize_t packet_len){
 
     uint8_t frame[ETH_MAX_FRAME_LEN];
 
-    frame_len = compose_ethernet_frame(frame, &tempeth, packet, packet_len);
+    frame_len = compose_ethernet_frame(frame, &tempeth, packet, packet_len-4);
 
     // Send frame to next interface
     printf("  Forwarding a %ld-byte ethernet frame\n", frame_len);
@@ -231,8 +231,8 @@ send_ICMP(struct icmpheader *icmp, uint8_t * packet, ssize_t packet_len){
         return -1;
     }
     
-    if(packet_len > 64 +sizeof(*ip)){
-        packet_len = 64+sizeof(*ip);
+    if(packet_len > 8 +sizeof(*ip)){
+        packet_len = 8+sizeof(*ip);
     }
     printf("packet:\n %s\n", binary_to_hex(packet, packet_len));
     printf("packet length: %d\n", packet_len);
@@ -373,10 +373,7 @@ int compose_ICMP_frame(uint8_t *frame, struct icmpheader *icmp, uint8_t *data, s
     // printf("DATA: %s\n", binary_to_hex(data , data_len));
 
     icmp->checksum = compute_icmp_checksum(icmp, data, data_len);
-    // if(data_len- sizeof(struct icmpheader) -sizeof(struct IPheader)> 64){
-    //     data_len =  sizeof(struct icmpheader) +sizeof(struct IPheader)+64;
-    // }
-
+   
     memcpy(frame, icmp, sizeof(*icmp));
     memcpy(frame + sizeof(*icmp), data, data_len);
 
