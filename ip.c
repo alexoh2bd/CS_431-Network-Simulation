@@ -38,7 +38,7 @@ int handle_ip_packet(struct interface *iface, uint8_t *packet, int packet_len){
     ip =(struct IPheader *)packet;
     uint16_t checksum_should_be;
 
-
+    
     char *hexdestaddress = binary_to_hex(&ip->dstAddress, 5);
 
     // take out fcs count
@@ -102,7 +102,6 @@ int route_packet(uint8_t *packet, ssize_t packet_len){
     uint8_t *destethaddr;
     struct eth_header tempeth;
     size_t frame_len;
-    
     ip->tos = 0;
     ip->ttl--;
     ip->headchksum = 0;
@@ -189,7 +188,7 @@ int route_packet(uint8_t *packet, ssize_t packet_len){
 // takes in host(little endian) ip address as argument
 struct route *
 lookup_route(uint32_t destip){
-    destip = htonl(destip);
+    // destip = htonl(destip);
     for(int i = 0; i< MAX_ROUTES&& routingTbl[i].iface; i++){  
         // printf("route: %08x\n", routingTbl[i].destination);
         // printf("destip & netmask: %08x\n", (destip & routingTbl[i].netmask));
@@ -240,12 +239,12 @@ send_ICMP(struct icmpheader *icmp, uint8_t * packet, ssize_t packet_len){
 
     // IP header
     ip->ttl++;
-    ip->length = htons(packet_len);
+    // ip->length = htons(packet_len);
     ip->headchksum = 0;
     ip->headchksum = compute_headchksum(ip);
     
     // compose ICMP header 
-    icmp_len = compose_ICMP_frame(icmpframe, icmp, packet, ntohs(ip->length));
+    icmp_len = compose_ICMP_frame(icmpframe, icmp, packet, packet_len);
     // printf("icmp length: %d\n", icmp_len);
 
 
