@@ -11,14 +11,13 @@
 #include "ethernet.h"
 #include "ip.h"
 #include "arp.h"
+#include "tcp1.h"
 
 #define MAX_ROUTES 10
 
 struct route routingTbl[MAX_ROUTES];
 
 int route_packet(uint8_t *packet, ssize_t packet_len);
-uint16_t compute_headchksum(struct IPheader *ip);
-struct route * lookup_route(uint32_t destip);
 int verify_checksum(struct IPheader *ip, uint16_t *shouldbe);
 uint16_t compute_icmp_checksum(struct icmpheader *icmp, uint8_t *data, size_t data_len);
 int compose_ICMP_frame(uint8_t *frame, struct icmpheader *icmp, uint8_t *data, size_t data_len);
@@ -46,12 +45,14 @@ int handle_ip_packet(struct interface *iface, uint8_t *packet, int packet_len){
 
     // Time to live = 0
  
+
+    // printf("packet: %s\n", binary_to_hex(packet, packet_len));
     // Length of IP packet does not match
     // printf("packet length = %d\n",htons(ip->length));
-    if(packet_len < htons(ip->length)){
-        printf("Dropping packet: wrong length (is %04x, should be: %04x)\n",   htons(ip->length), packet_len);
-        return -1;
-    }
+    // if(packet_len < htons(ip->length)){
+    //     printf("Dropping packet: wrong length (is %04x, should be: %04x)\n",   htons(ip->length), packet_len);
+    //     return -1;
+    // }
     if(ip->ttl ==0){
         printf("Dropping packet: TTL is 0\n");
         return -1;
@@ -63,9 +64,12 @@ int handle_ip_packet(struct interface *iface, uint8_t *packet, int packet_len){
         return -1;
     }
 
+    // handling tcp packets
     for(int i = 0; i < MAX_INTERFACES; i++){
         if(ip->dstAddress == interfaces[i].ip_addr){
-            printf("  delivering locally\n");
+            printf("  delivering locally: handling TCP packet\n");
+
+            handle_tcp_packet(packet, packet_len);
             return 0;
         }
     }
@@ -148,7 +152,7 @@ int route_packet(uint8_t *packet, ssize_t packet_len){
     // Determines if packet is meant for a device directly connected to network
     if(r->gateway == 0x00000000){
         printf("  destination host is on attached network\n");
-        destethaddr = arp_lookup(ip->dstAddress);
+        destethaddr = arp_lookup((ip->dstAddress));
     }
     else{
         // finds gateway network address in ARP to forward packets
@@ -358,13 +362,12 @@ uint16_t compute_icmp_checksum(struct icmpheader *icmp, uint8_t *data, size_t da
     }
     if(size > 0){
         sum+=(uint8_t) *s;
+        sum+=0xff;
     }
     while(sum >> 16){
         sum = (sum &0xffff) + (sum>>16);
-        // printf("sum: %04X\n", ~sum);
     }
     checksum = ~sum & 0xffff;
-    // printf("checksum %04X\n", checksum);
     return checksum;
 }
 int compose_ICMP_frame(uint8_t *frame, struct icmpheader *icmp, uint8_t *data, size_t data_len){

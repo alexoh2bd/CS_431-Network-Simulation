@@ -13,6 +13,7 @@
 #include "ethernet.h"
 #include "ip.h"
 #include "arp.h"
+#include "tcp1.h"
 
 struct arp_entry{
     char ip [16];
@@ -33,25 +34,26 @@ int main(int argc, char *argv[])
 {
     ip_init();
     arp_init();
+    tcp_init();
 
     memset(interfaces, '\0', sizeof(interfaces));
-    add_interface("/tmp/net1.vde", (uint8_t *) "\x11\x22\x33\xaa\xbb\xcc", 0x77102040, "interface1");
-    add_interface("/tmp/net2.vde", (uint8_t *) "\x10\x10\x10\x10\x10\x10", 0x2235afcd, "interface2");
+    add_interface("/tmp/net0.vde", (uint8_t *) "\x11\x22\x33\xaa\xbb\xcc", 0x0a00a8c0, "interface1");
+    // add_interface("/tmp/net2.vde", (uint8_t *) "\x10\x10\x10\x10\x10\x10", 0x2235afcd, "interface2");
 
 
 
    
-    add_route(0x00102040, 0x00ffffff, 0x00000000, &interfaces[0]);  // network 1: sender1s
-    add_route(0x0035afcd, 0x00ffffff, 0x00000000, &interfaces[1]);  // network 2: sender2a
-    add_route(0x0045afcd, 0x00ffffff, 0x4545afcd, &interfaces[1]);  // network 2: gateway test
+    add_route(0x0000a8c0, 0x00ffffff, 0x00000000, &interfaces[0]);  // network 1: sender1s
+    // add_route(0x0035afcd, 0x00ffffff, 0x00000000, &interfaces[1]);  // network 2: sender2a
+    // add_route(0x0045afcd, 0x00ffffff, 0x4545afcd, &interfaces[1]);  // network 2: gateway test
 
 
-    // |  eth address | ip address |
-    add_arp((uint8_t *) "\x77\x88\x99\xdd\xee\xff", 0x08102040);    // sender1a
-    add_arp((uint8_t *) "\x45\x45\x45\x45\x45\x15", 0x20102040);    // sender1b
+    // // |  eth address | ip address |
+    add_arp((uint8_t *) "\x58\x9c\xfc\x00\xbb\x3c", 0x0400a8c0);    // sender1a
+    // add_arp((uint8_t *) "\x45\x45\x45\x45\x45\x15", 0x20102040);    // sender1b
 
-    add_arp((uint8_t *) "\x50\x50\x50\x50\x50\x10", 0x3535afcd);    // sender2a
-    add_arp((uint8_t *) "\x40\x40\x40\x40\x40\x40", 0x4545afcd);    // sender2b
+    // add_arp((uint8_t *) "\x50\x50\x50\x50\x50\x10", 0x3535afcd);    // sender2a
+    // add_arp((uint8_t *) "\x40\x40\x40\x40\x40\x40", 0x4545afcd);    // sender2b
 
     // add_interface("/tmp/net1.vde", (uint8_t *) "\x11\x22\x33\xaa\xbb\xcc", 0x40201077, "interface1");
     // add_interface("/tmp/net2.vde", (uint8_t *) "\x10\x10\x10\x10\x10\x10", 0xcdaf3522, "interface2");

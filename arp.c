@@ -41,7 +41,7 @@ int add_arp(uint8_t *eth_addr, uint32_t ip_addr){
 // takes host(little endian) address as argument
 uint8_t *arp_lookup(uint32_t ip){
     // search by ip address
-    ip = htonl(ip);
+    // ip = htonl(ip);
     // printf("IP: %08X\n", ip);
     for(int i = 0; i < ARP_CACHE_SIZE; i++){
         // printf("arbtbl[%d]: %08X    \n", i, arpTbl[i].ip);
@@ -76,16 +76,18 @@ handle_arp_packet(struct interface *iface, uint8_t *packet, int packet_len){
         memcpy(arp->sendereth, &iface->eth_addr, 6);
         memcpy(arp->senderip, &tempip, 4);
 
-        uint8_t *temptargeteth = arp_lookup(arp->targetip);
+        uint8_t *temptargeteth = arp_lookup((arp->targetip));
+        
+        // enters new arp entry if no arp is found
         if (temptargeteth == NULL){
             printf("   ARP was not found\n");
+            // add_arp(arp->sendereth, arp->targetip);
+            // printf("   Added new arp entry to cache: Eth %s, IP %08X\n\n", binary_to_hex(arp->sendereth,7), arp->targetip);
             return 0;
-        }
+        }else{
         memcpy(arp->targeteth, temptargeteth, 6);
         
-
-
-
+        }
         printf("found eth %s for ip %08X\n", binary_to_hex(arp->targeteth,7), arp->targetip);
         int frame_len = compose_ethernet_frame(frame, eh, packet, sizeof(struct arp_header)+1);
         // printf("final frame:\n %s\n", binary_to_hex(frame, frame_len+1) );

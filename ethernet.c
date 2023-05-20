@@ -53,6 +53,7 @@ handle_ethernet_frame(struct interface *iface){
     memcpy(fcs, ((frame + frame_len - 4)), 5);
     checkfcs = crc32(0, (void *) frame, frame_len - 4);
     memcpy(hexfcs, &checkfcs, sizeof(uint32_t));
+
     //  printf("  (fcs: got %s expected %s)\n" ,  binary_to_hex((void *)fcs, 5), binary_to_hex((void *)hexfcs, 5));
     if(frame_len<ETH_MIN_DATA_LEN){
         printf("  ignoring %zd-byte frame (too short)\n", frame_len);
@@ -60,10 +61,10 @@ handle_ethernet_frame(struct interface *iface){
     }
 
     // check fcs
-    else if(memcmp(hexfcs,fcs, 4) != 0){
-        printf("  ignoring %zd-byte frame (bad fcs: got %s expected %s)\n" , frame_len, binary_to_hex((void *)fcs, 5), binary_to_hex((void *)hexfcs, 5));
-        return -1;
-    }
+    // else if(memcmp(hexfcs,fcs, 4) != 0){
+    //     printf("  ignoring %zd-byte frame (bad fcs: got %s expected %s)\n" , frame_len, binary_to_hex((void *)fcs, 5), binary_to_hex((void *)hexfcs, 5));
+    //     return -1;
+    // }
 
     // Broadcast frame
     else if((memcmp(eh->dst_addr, broadcast, 6)) == 0){
@@ -82,22 +83,25 @@ handle_ethernet_frame(struct interface *iface){
     // printf("eh->dst_addr: %s\n", binary_to_hex(eh->dst_addr, 7));
     if(memcmp(eh->dst_addr, iface->eth_addr, 6)==0 || isbroadcast == 1){
         char *hexmac = binary_to_hex(eh->src_addr, 7);
-        printf("  frame is for me, from %s\n", hexmac);
+        // printf("  frame is for me, from %s\n", hexmac);
         free(hexmac);
         // printf("eth typ: %04X\n", eh->type);
         // check type of address
         switch (ntohs(eh->type)){
             // handle IP packet with payload
-            case ETH_TYPE_IP:    printf("  has type ip\n"); 
+            case ETH_TYPE_IP:    
+                // printf("  has type ip\n"); 
                 // divide frame into payload to pass to ip
                 handle_ip_packet(iface, payload, payload_len);
                 break;
 
-            case ETH_TYPE_ARP:  printf("  has type arp\n");
+            case ETH_TYPE_ARP:  
+                // printf("  has type arp\n");
                 handle_arp_packet(iface, payload, payload_len);
                 break;
 
-            default: printf("  dropping frame, unknown type\n");
+            default: 
+                // printf("  dropping frame, unknown type\n");
                 break;
         }
 
@@ -127,7 +131,7 @@ compose_ethernet_frame(uint8_t *frame, struct eth_header *eh, uint8_t *data, siz
 
     // fill in the rest of the frame if too little data
     if(data_len <ETH_MIN_DATA_LEN){
-        memset(frame + sizeof(eh) + data_len, '\0', ETH_MIN_DATA_LEN - data_len);
+        memset(frame + sizeof(*eh) + data_len, '\0', ETH_MIN_DATA_LEN - data_len);
         data_len = ETH_MIN_DATA_LEN;
     }
 

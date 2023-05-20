@@ -13,7 +13,8 @@
         "stdint.h": "c",
         "ethernet.h": "c",
         "inet.h": "c",
-        "stack.h": "c"
+        "stack.h": "c",
+        "crc32.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }
