@@ -83,7 +83,7 @@ composeAck(struct eth_header * eth, struct IPheader * ip, struct tcpheader * tcp
         tcp->ackNumber +=htonl(1);
         tcp->seqNumber = htonl(number+1);
         tcp->checksum = compute_tcp_checksum(ip, tcp, payload+sizeof(*ip) + 20, payload_len - sizeof(struct IPheader)-20);
-        printf("    Sending SYN ACK packet: %u\n", tcp->ackNumber);
+        printf("    Sending SYN ACK packet: %u\n\n\n", tcp->ackNumber);
 
     }
     // PSH ACK packet
@@ -102,7 +102,7 @@ composeAck(struct eth_header * eth, struct IPheader * ip, struct tcpheader * tcp
         uint32_t number = tcp->ackNumber;
         tcp->ackNumber = tcp->seqNumber;
         tcp->seqNumber = number;
-        tcp->ackNumber += htonl(payload_len - 40);
+        tcp->ackNumber += htonl(payload_len - 40+4);
         uint8_t * data =payload+sizeof(*ip) + 20;
         size_t data_len = payload_len-40 + 4;
         // printf("Payload length: %u\n", payload_len -40);
@@ -118,7 +118,7 @@ composeAck(struct eth_header * eth, struct IPheader * ip, struct tcpheader * tcp
 
 
 
-        printf("    Sending ACK packet: %u\n", tcp->ackNumber);
+        printf("    Sending ACK packet: %u\n\n \n", tcp->ackNumber);
     }
     // FIN ACK packet
     else if(tcp->flags == 0x11){
@@ -132,7 +132,7 @@ composeAck(struct eth_header * eth, struct IPheader * ip, struct tcpheader * tcp
         tcp->seqNumber = (number);
         tcp->checksum = compute_tcp_checksum(ip, tcp, payload+sizeof(*ip) + 20, 0);
         payload_len = 40;
-        printf("    Sending ACK packet: %u\n", tcp->ackNumber);
+        printf("    Sending ACK packet: %u\n\n\n", tcp->ackNumber);
 
     }
     // printf("checksum: %04X\n", tcp->checksum);
