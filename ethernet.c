@@ -56,6 +56,7 @@ handle_ethernet_frame(struct interface *iface){
 
     //  printf("  (fcs: got %s expected %s)\n" ,  binary_to_hex((void *)fcs, 5), binary_to_hex((void *)hexfcs, 5));
     if(frame_len<ETH_MIN_DATA_LEN){
+
         printf("  ignoring %zd-byte frame (too short)\n", frame_len);
         return -1;
     }
@@ -72,7 +73,7 @@ handle_ethernet_frame(struct interface *iface){
         printf("  received %zd-byte broadcast frame from %s\n", frame_len, hexsrc);
     }
     else if(memcmp(eh->dst_addr, iface->eth_addr, 6) != 0){
-        printf("  ignoring %zd-byte broadcast frame (mismatching MAC address)\n", frame_len);
+        printf("  ignoring %zd-byte broadcast frame (mismatching MAC address %s, %s)\n", frame_len, binary_to_hex(eh->dst_addr, 7), binary_to_hex(iface->eth_addr,7));
     }
     free(hexsrc);
 
@@ -138,7 +139,6 @@ compose_ethernet_frame(uint8_t *frame, struct eth_header *eh, uint8_t *data, siz
     // add fcs
     fcs = crc32(0, frame, sizeof(struct eth_header) + data_len);
     memcpy(frame+ sizeof(*eh) + data_len, &fcs, ETH_FCS_LEN);
-    // printf("fcs: %04X\n", fcs);
 
     // return total length of frame
     return sizeof(*eh) + data_len + ETH_FCS_LEN;

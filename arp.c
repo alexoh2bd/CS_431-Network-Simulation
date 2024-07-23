@@ -42,11 +42,11 @@ int add_arp(uint8_t *eth_addr, uint32_t ip_addr){
 uint8_t *arp_lookup(uint32_t ip){
     // search by ip address
     // ip = htonl(ip);
-    // printf("IP: %08X\n", ip);
+    //printf("IP: %08X\n", (ip));
     for(int i = 0; i < ARP_CACHE_SIZE; i++){
-        // printf("arbtbl[%d]: %08X    \n", i, arpTbl[i].ip);
-        if(arpTbl[i].ip == ip){
-            // printf("found arp for %08X\n", ntohl(ip));
+       	//printf("arbtbl[%d]: %08X    \n", i, arpTbl[i].ip);
+        if(arpTbl[i].ip == (ip)){
+            //printf("found arp for %08X\n", ntohl(ip));
             return arpTbl[i].eth;
         }
     }
@@ -59,7 +59,6 @@ handle_arp_packet(struct interface *iface, uint8_t *packet, int packet_len){
     struct arp_header *arp = (struct arp_header *)packet;
     // printf("hardaddr: %04X\n",arp->protaddlen);
     // printf("arp opcode: %04X\n",arp-> opcode);
-
     // this is a request packet
     if(ntohs(arp->opcode) == 1){
         uint8_t frame[ETH_MAX_FRAME_LEN];

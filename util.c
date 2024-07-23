@@ -71,11 +71,9 @@ void *hex_to_binary(char *hex){
     // uses int array to set hex value
     while(j < n){
         *((char *)ret + j) = (char)(arr[k] * 16 + arr[k+1]);
-       // printf("%s", (ret+ j));
         j ++;
         k+=2;
     }
-    // printf("\nret: ",ret);
     free(arr);
     return ret;
 

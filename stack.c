@@ -1,3 +1,8 @@
+/*
+ *
+ * stack.c
+ *
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -36,41 +41,25 @@ int main(int argc, char *argv[])
     arp_init();
     tcp_init();
 
+    // Interface Tables
     memset(interfaces, '\0', sizeof(interfaces));
-    add_interface("/tmp/net0.vde", (uint8_t *) "\x11\x22\x33\xaa\xbb\xcc", 0x0a00a8c0, "interface1");
-    add_interface("/tmp/net1.vde", (uint8_t *) "\x10\x10\x10\x10\x10\x10", 0x2235afcd, "interface2");
+    add_interface("/tmp/net0.vde", (uint8_t *) "\x11\x22\x33\xaa\xbb\xcc", 0x40201030, "interface1");
+    add_interface("/tmp/net1.vde", (uint8_t *) "\x10\x10\x10\x10\x10\x10", 0x3535afef, "interface2");
 
 
+    // Routing tables
+    // | dest | netmask | gateway | interface
+    add_route(0x40201000, 0xffffff00, 0x00000000, &interfaces[0]);  // network 1: host1 network
+    add_route(0x3535af00, 0xffffff00, 0x00000000, &interfaces[1]);  // network 2: host2 network			
+    add_route(0xeeeeee00, 0xffffff00, 0x22222222, &interfaces[1]);  // network 2: gateway test -> host3 network
 
-   
-    add_route(0x0000a8c0, 0x00ffffff, 0x00000000, &interfaces[0]);  // network 1: sender1s
-    add_route(0x0000a8c0, 0x00ffffff, 0x00000000, &interfaces[1]);  // network 2: sender2a
-    add_route(0x0045afcd, 0x00ffffff, 0x4545afcd, &interfaces[1]);  // network 2: gateway test
+    // ARP table
+    // | eth address | ip address |
+    add_arp((uint8_t *) "\x77\x88\x99\xdd\xee\xff", 0x40201008);    // host1 eth-ip mapping
+    add_arp((uint8_t *) "\x50\x50\x50\x50\x50\x10", 0x3535afcd);    // host2 eth-ip mapping
+    add_arp((uint8_t *) "\x10\x30\x10\x30\x10\x30", 0x22222222);    // to host 3 eth of stack2 mapping
 
-
-    // // |  eth address | ip address |
-    add_arp((uint8_t *) "\x58\x9c\xfc\x00\xbb\x3c", 0x0400a8c0);    // sender1a
-    add_arp((uint8_t *) "\x45\x45\x45\x45\x45\x15", 0x20102040);    // sender1b
-
-    // add_arp((uint8_t *) "\x50\x50\x50\x50\x50\x10", 0x3535afcd);    // sender2a
-    // add_arp((uint8_t *) "\x40\x40\x40\x40\x40\x40", 0x4545afcd);    // sender2b
-
-    // add_interface("/tmp/net1.vde", (uint8_t *) "\x11\x22\x33\xaa\xbb\xcc", 0x40201077, "interface1");
-    // add_interface("/tmp/net2.vde", (uint8_t *) "\x10\x10\x10\x10\x10\x10", 0xcdaf3522, "interface2");
-   
-    // add_route(0x40201000, 0xffffff00, 0x00000000, &interfaces[0]);  // network 1: sender1s
-    // add_route(0xcdaf3500, 0xffffff00, 0x00000000, &interfaces[1]);  // network 2: sender2a
-    // add_route(0xcdaf4500, 0xffffff00, 0x4545afcd, &interfaces[1]);  // network 2: gateway test
-
-
-    // // |  eth address | ip address |
-    // add_arp((uint8_t *) "\x77\x88\x99\xdd\xee\xff", 0x40201008);    // sender1a
-    // add_arp((uint8_t *) "\x45\x45\x45\x45\x45\x15", 0x40201020);    // sender1b
-
-    // add_arp((uint8_t *) "\x50\x50\x50\x50\x50\x10", 0xcdaf3535);    // sender2a
-    // add_arp((uint8_t *) "\x40\x40\x40\x40\x40\x40", 0xcdaf4545);    // sender2b
-
-    //  ASSIGNMENT 3 POLLLLS
+    // Receiving Frames
     struct pollfd fds[num_interfaces];
     for(int i = 0; i < num_interfaces; i++){
         fds[i].fd = interfaces[i].in_fd;
@@ -86,7 +75,6 @@ int main(int argc, char *argv[])
         for(int i = 0; i < num_interfaces; i++){
             if(fds[i].revents & POLLIN){
                 // if there is a readable input, handle ethernet frame
-                // printf("stack received ethernet frame on interface %d\n", i);
                 handle_ethernet_frame(&interfaces[i]);
             }
         }
